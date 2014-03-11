@@ -49,7 +49,6 @@ class Resque_CredisClientEx extends Credis_Client
                 $this->timeout !== null ? $this->timeout : 2.5,
                 $flags
             );
-            var_dump($remote_socket, $errstr);
         } else {
             if (!$this->redis) {
                 $this->redis = new Redis;
