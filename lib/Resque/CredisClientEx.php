@@ -1,6 +1,6 @@
 <?php
 
-class Credis_Client_ex extends Credis_Client
+class Resque_CredisClientEx extends Credis_Client
 {
     protected $maxConnectRetries = 5;
 
