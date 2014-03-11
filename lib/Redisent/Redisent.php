@@ -20,7 +20,7 @@ if (!class_exists('RedisException', false)) {
 /**
  * Redisent, a Redis interface for the modest among us
  */
-class Redis
+class Redisent
 {
     /**
      * Socket connection to the Redis server
