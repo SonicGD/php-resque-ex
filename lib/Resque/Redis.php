@@ -126,7 +126,7 @@ class Resque_Redis
                 }
             }
 
-            $this->driver = new Credis_Client($host, $port);
+            $this->driver = new Credis_Client_ex($host, $port);
             if (isset($password)) {
                 $this->driver->auth($password);
             }
