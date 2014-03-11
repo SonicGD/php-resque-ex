@@ -19,7 +19,7 @@ if (class_exists('Redis')) {
 
         function establishConnection()
         {
-            $this->pconnect($this->host, (int)$this->port, (int)$this->timeout);
+            $this->connect($this->host, (int)$this->port, (int)$this->timeout);
             if ($this->database !== 0) {
                 $this->select($this->database);
             }
