@@ -226,7 +226,7 @@ class Resque_Worker
 
             $workerName = $this->hostname . ':'.getmypid();
 
-            $this->child = $this->fork();
+            $this->child = Resque::fork();
 
             // Forked and we're the child. Run the job.
             if ($this->child === 0 || $this->child === false) {
@@ -324,27 +324,6 @@ class Resque_Worker
         $queues = Resque::queues();
         sort($queues);
         return $queues;
-    }
-
-    /**
-     * Attempt to fork a child process from the parent to run a job in.
-     *
-     * Return values are those of pcntl_fork().
-     *
-     * @return int -1 if the fork failed, 0 for the forked child, the PID of the child for the parent.
-     */
-    protected function fork()
-    {
-        if (!function_exists('pcntl_fork')) {
-            return false;
-        }
-
-        $pid = pcntl_fork();
-        if ($pid === -1) {
-            throw new RuntimeException('Unable to fork child worker.');
-        }
-
-        return $pid;
     }
 
     /**

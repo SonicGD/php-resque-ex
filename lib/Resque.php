@@ -63,15 +63,7 @@ class Resque
      */
     public static function redis()
     {
-        // Detect when the PID of the current process has changed (from a fork, etc)
-        // and force a reconnect to redis.
-        $pid = getmypid();
-        if (self::$pid !== $pid) {
-            self::$redis = null;
-            self::$pid = $pid;
-        }
-
-        if (!is_null(self::$redis)) {
+        if (self::$redis !== null) {
             return self::$redis;
         }
 
@@ -80,23 +72,35 @@ class Resque
             $server = 'localhost:6379';
         }
 
-        if (is_array($server)) {
-            require_once dirname(__FILE__) . '/Resque/RedisCluster.php';
-            self::$redis = new Resque_RedisCluster($server);
-        } else {
-            if (strpos($server, 'unix:') === false) {
-                list($host, $port) = explode(':', $server);
-            } else {
-                $host = $server;
-                $port = null;
-            }
-            require_once dirname(__FILE__) . '/Resque/Redis.php';
-            $redisInstance = new Resque_Redis($host, $port, self::$redisDatabase);
-            $redisInstance->prefix(self::$namespace);
-            self::$redis = $redisInstance;
+        self::$redis = new Resque_Redis($server, self::$redisDatabase);
+        return self::$redis;
+    }
+
+    /**
+     * fork() helper method for php-resque that handles issues PHP socket
+     * and phpredis have with passing around sockets between child/parent
+     * processes.
+     *
+     * Will close connection to Redis before forking.
+     *
+     * @return int Return vars as per pcntl_fork()
+     */
+    public static function fork()
+    {
+        if (!function_exists('pcntl_fork')) {
+            return -1;
         }
 
-        return self::$redis;
+        // Close the connection to Redis before forking.
+        // This is a workaround for issues phpredis has.
+        self::$redis = null;
+
+        $pid = pcntl_fork();
+        if ($pid === -1) {
+            throw new RuntimeException('Unable to fork child worker.');
+        }
+
+        return $pid;
     }
 
     /**
