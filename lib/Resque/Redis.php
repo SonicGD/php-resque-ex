@@ -126,7 +126,7 @@ class Resque_Redis
         try {
             return $this->driver->__call($name, $args);
         } catch (CredisException $e) {
-            if ($e->getMessage() == "Connection lost") {
+            if (!$this->ping()) {
                 $this->connect();
                 return $this->__call($name, $args);
             } else {
